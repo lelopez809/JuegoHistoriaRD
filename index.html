@@ -60,10 +60,27 @@
         .event-title { color: #FFD700; font-size: 1.2em; margin-bottom: 15px; }
         .progress-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #555; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.5s ease; }
+        .test-css-class {
+            background-color: #ff00ff; /* Magenta de prueba */
+        }
+    /* Prueba de edición - Jules v3 */
+
+        /* Estilos específicos para el Popup de Notas de Aprendizaje */
+        #learningNoteContent {
+            text-align: left; /* Asegurar alineación a la izquierda para textos largos */
+            line-height: 1.6; /* Mejorar legibilidad para bloques de texto */
+        }
+
+        /* Para asegurar que el botón dentro del nuevo popup también tome el ancho completo si es necesario */
+        /* Aunque la clase .btn ya tiene width: 100%, esto es por si acaso o para futuras modificaciones */
+        #closeLearningNoteBtn {
+            /* Podríamos añadir estilos específicos aquí si fueran necesarios en el futuro */
+            /* Por ahora, hereda de .btn y es suficiente */
+        }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
+    <div id="gameContainer" data-test-id="jules-test">
         <div id="canvasContainer">
             <canvas id="gameCanvas"></canvas>
         </div>
@@ -419,5 +436,10 @@
         window.addEventListener('load', initGame);
         window.addEventListener('resize', initGame);
     </script>
+    <div id="learningNotePopup" class="event-popup" style="display: none;">
+        <div class="event-title" id="learningNoteTitle"></div>
+        <div id="learningNoteContent" style="margin-bottom: 15px; max-height: 300px; overflow-y: auto;"></div>
+        <button class="btn" id="closeLearningNoteBtn">Entendido</button>
+    </div>
 </body>
 </html>
