@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia Dominicana - Versión Definitiva y Completa</title>
+    <style>
+        /* 1. Reset para quitar márgenes */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 2. Estilos para forzar pantalla completa */
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 3. Contenedor principal del juego */
+        #gameContainer {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #canvasContainer {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+        }
+
+        /* 4. Estilos para la barra lateral (UI) */
+        #ui {
+            width: 320px;
+            flex-shrink: 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 5px solid #654321;
+            overflow-y: auto;
+            color: white;
+        }
+        .era-title { color: #FFD700; font-size: 1.3em; text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
+        .resource-panel, .info-panel, .controls { background: rgba(139, 69, 19, 0.2); padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 2px solid #8B4513; }
+        .resource-item { display: flex; justify-content: space-between; margin: 10px 0; font-size: 1em; }
+        .info-panel { background: rgba(0, 50, 100, 0.2); border-color: #4682B4; }
+        .controls { background: rgba(50, 50, 50, 0.3); border-color: #666; }
+        .btn { background: #8B4513; color: white; border: none; padding: 10px 15px; margin: 5px 0; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.9em; transition: background 0.3s; width: 100%; border-bottom: 3px solid #654321; }
+        .btn:hover { background: #A0522D; }
+        .btn:active { transform: translateY(2px); border-bottom-width: 1px; }
+        .event-popup, #gameOverScreen { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); border: 3px solid #FFD700; border-radius: 10px; padding: 25px; width: 90%; max-width: 450px; text-align: center; z-index: 1000; display: none; }
+        .event-title { color: #FFD700; font-size: 1.2em; margin-bottom: 15px; }
+        .progress-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #555; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.5s ease; }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="canvasContainer">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+        <div id="ui">
+            <div class="era-title">ERA TAÍNA</div>
+            <div class="resource-panel">
+                <h3>🏘️ Recursos</h3>
+                <div class="resource-item"><span>👥 Población:</span><span id="population"></span></div>
+                <div class="resource-item"><span>🌽 Comida:</span><span id="food"></span></div>
+                <div class="resource-item"><span>🪨 Materiales:</span><span id="materials"></span></div>
+                <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+            </div>
+            <div class="info-panel">
+                <h4>📜 Misión</h4>
+                <p>Guía a tu pueblo. Hazlo próspero antes de que lleguen los tiempos de cambio.</p>
+            </div>
+            <div class="controls">
+                <h4>⚡ Acciones</h4>
+                <button class="btn" onclick="cultivate()">🌱 Cultivar</button>
+                <button class="btn" onclick="hunt()">🏹 Cazar</button>
+                <button class="btn" onclick="build()">🏗️ Construir Bohío</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="eventPopup" class="event-popup"><div class="event-title" id="eventTitle"></div><div id="eventDescription"></div><button class="btn" onclick="closeEvent()">Continuar</button></div>
+    <div id="gameOverScreen" class="event-popup"><div class="event-title">FIN DEL JUEGO</div><div id="gameOverMessage"></div><button class="btn" onclick="location.reload()">Jugar de Nuevo</button></div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        let gameState = { population: 25, food: 100, materials: 50, progress: 15 };
+        let villagers = [], buildings = [], trees = [], animals = [], clouds = [];
+        let gameInterval;
+        
+        const animalTypes = { JUTIA: { name: 'Jutía' }, IGUANA: { name: 'Iguana' }, COTORRA: { name: 'Cotorra'}, PEZ: { name: 'Pez'} };
+
+        function resizeCanvas() {
+            const container = document.getElementById('canvasContainer');
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+        }
+
+        function initGame() {
+            if (gameInterval) clearInterval(gameInterval);
+            resizeCanvas();
+            villagers = [];
+            buildings = [];
+            trees = [];
+            animals = [];
+            clouds = [];
+            
+            for (let i = 0; i < 30; i++) {
+                trees.push(createTree());
+            }
+            for (let i = 0; i < 2; i++) {
+                buildings.push(createBuilding());
+            }
+            for (let i = 0; i < 8; i++) {
+                villagers.push(createVillager());
+            }
+            for (let i = 0; i < 4; i++) {
+                animals.push(createAnimal(animalTypes.JUTIA));
+            }
+            for (let i = 0; i < 3; i++) {
+                animals.push(createAnimal(animalTypes.IGUANA));
+            }
+            for (let i = 0; i < 5; i++) {
+                animals.push(createAnimal(animalTypes.COTORRA));
+            }
+            for (let i = 0; i < 8; i++) {
+                animals.push(createAnimal(animalTypes.PEZ));
+            }
+            for (let i = 0; i < 3; i++) {
+                clouds.push({ x: Math.random() * canvas.width, y: Math.random() * 100 + 20, speed: 0.1 + Math.random() * 0.2 });
+            }
+
+            updateDisplay();
+            gameInterval = setInterval(updateGameLogic, 5000);
+            gameLoop();
+        }
+
+        function gameLoop() {
+            villagers.forEach(moveObject);
+            animals.forEach(moveObject);
+            clouds.forEach(cloud => {
+                cloud.x += cloud.speed;
+                if (cloud.x > canvas.width + 60) {
+                    cloud.x = -60;
+                }
+            });
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawScenery();
+            let allObjects = [...trees, ...buildings, ...villagers, ...animals].sort((a, b) => a.y - b.y);
+            allObjects.forEach(obj => {
+                if(obj.isBuilding) {
+                    drawBohio(obj.x, obj.y);
+                } else if(obj.isTree) {
+                    drawPalmTree(obj.x, obj.y);
+                } else if(obj.isVillager) {
+                    drawTaino(obj.x, obj.y);
+                } else if(obj.isAnimal) {
+                    drawAnimal(obj);
+                }
+            });
+            clouds.forEach(cloud => {
+                drawCloud(cloud.x, cloud.y);
+            });
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- FUNCIONES DE CREACIÓN (EXPANDIDAS Y CLARAS) ---
+        function createVillager() {
+            return {
+                x: Math.random() * (canvas.width - 20),
+                y: Math.random() * (canvas.height - 150) + 50,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                isVillager: true
+            };
+        }
+        
+        function createBuilding() {
+            return {
+                x: Math.random() * (canvas.width - 50),
+                y: Math.random() * (canvas.height - 250) + 100,
+                isBuilding: true
+            };
+        }
+
+        function createTree() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * (canvas.height - 100),
+                isTree: true
+            };
+        }
+
+        function createAnimal(type) {
+            let habitat = (type.name === 'Pez') ? 'agua' : (type.name === 'Cotorra' ? 'aire' : 'tierra');
+            let animal = {
+                x: Math.random() * canvas.width,
+                y: 0, // Se asigna abajo
+                vx: (Math.random() - 0.5) * 1.2,
+                vy: (Math.random() - 0.5) * 1.2,
+                type: type,
+                isAnimal: true,
+                habitat: habitat
+            };
+
+            if (habitat === 'agua') {
+                animal.y = canvas.height - 75 + Math.random() * 70;
+            } else if (habitat === 'aire') {
+                animal.y = Math.random() * 150;
+            } else {
+                animal.y = Math.random() * (canvas.height - 150) + 50;
+            }
+            return animal;
+        }
+
+        // --- FUNCIÓN DE MOVIMIENTO (EXPANDIDA Y CLARA) ---
+        function moveObject(obj) {
+            obj.x += obj.vx;
+            obj.y += obj.vy;
+
+            if (obj.x <= 0 || obj.x >= canvas.width - 20) {
+                obj.vx *= -1;
+            }
+
+            if (obj.habitat === 'agua') {
+                if (obj.y <= canvas.height - 80 || obj.y >= canvas.height - 10) {
+                    obj.vy *= -1;
+                }
+            } else {
+                if (obj.y <= 20 || obj.y >= canvas.height - 100) {
+                    obj.vy *= -1;
+                }
+            }
+        }
+        
+        // --- FUNCIONES DE DIBUJO (EXPANDIDAS Y CLARAS) ---
+        function drawScenery() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.7, '#98FB98');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#F4A460';
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 20);
+            ctx.fillStyle = '#4682B4';
+            ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+        }
+
+        function drawCloud(x, y) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(x, y, 25, 10);
+            ctx.fillRect(x - 10, y + 5, 45, 15);
+            ctx.fillRect(x + 10, y - 5, 25, 10);
+        }
+
+        function drawTaino(x, y) {
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(x + 5, y + 12, 6, 3);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 3, y + 1, 10, 3);
+            ctx.fillRect(x + 2, y + 2, 2, 2);
+            ctx.fillRect(x + 12, y + 2, 2, 2);
+            ctx.fillStyle = '#D2691E';
+            ctx.fillRect(x + 4, y + 2, 8, 6);
+            ctx.fillRect(x + 5, y + 8, 6, 8);
+            ctx.fillRect(x + 3, y + 9, 2, 4);
+            ctx.fillRect(x + 11, y + 9, 2, 4);
+            ctx.fillRect(x + 5, y + 16, 2, 3);
+            ctx.fillRect(x + 9, y + 16, 2, 3);
+        }
+
+        function drawBohio(x, y) {
+            ctx.fillStyle = '#DEB887';
+            ctx.fillRect(x + 4, y + 12, 24, 12);
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(x + 13, y + 16, 6, 8);
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.moveTo(x, y + 12);
+            ctx.lineTo(x + 16, y);
+            ctx.lineTo(x + 32, y + 12);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawPalmTree(x, y) {
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(x + 6, y + 16, 4, 8);
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(x + 2, y + 8, 12, 8);
+            ctx.fillRect(x, y + 6, 4, 2);
+            ctx.fillRect(x + 12, y + 6, 4, 2);
+            ctx.fillRect(x + 4, y + 4, 2, 4);
+            ctx.fillRect(x + 10, y + 4, 2, 4);
+            ctx.fillRect(x + 6, y + 2, 4, 6);
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(x + 7, y + 14, 2, 2);
+            ctx.fillRect(x + 9, y + 15, 2, 2);
+        }
+
+        function drawAnimal(animal) {
+            const { x, y, type } = animal;
+            if (type.name === 'Jutía') {
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(x, y, 12, 8);
+                ctx.fillRect(x + 12, y + 3, 3, 3);
+            } else if (type.name === 'Iguana') {
+                ctx.fillStyle = '#2E8B57';
+                ctx.fillRect(x, y, 18, 5);
+                ctx.fillRect(x + 18, y + 2, 8, 2);
+                ctx.fillRect(x + 2, y + 5, 2, 3);
+                ctx.fillRect(x + 14, y + 5, 2, 3);
+            } else if (type.name === 'Cotorra') {
+                ctx.fillStyle = '#32CD32';
+                ctx.fillRect(x + 2, y, 8, 8);
+                ctx.fillStyle = '#FF4500';
+                ctx.fillRect(x, y + 2, 2, 2);
+            } else if (type.name === 'Pez') {
+                ctx.fillStyle = '#4169E1';
+                ctx.fillRect(x, y, 10, 5);
+                ctx.fillRect(x + 10, y + 1, 4, 3);
+            }
+        }
+        
+        // --- FUNCIONES DE LÓGICA Y UI (EXPANDIDAS Y CLARAS) ---
+        function updateDisplay() {
+            document.getElementById('population').textContent = gameState.population;
+            document.getElementById('food').textContent = gameState.food;
+            document.getElementById('materials').textContent = gameState.materials;
+            document.getElementById('progressBar').style.width = gameState.progress + '%';
+        }
+
+        function updateGameLogic() {
+            gameState.food -= Math.ceil(gameState.population / 5);
+            if (gameState.food <= 0) {
+                gameState.food = 0;
+                gameState.population -= 1;
+                if (gameState.population <= 0) {
+                    gameState.population = 0;
+                    showGameOver("Tu aldea ha desaparecido.");
+                } else {
+                    showEvent("¡Hambruna!", "Tu gente está muriendo de hambre.");
+                }
+            }
+            updateDisplay();
+        }
+
+        function hunt() {
+            let landAnimals = animals.filter(a => a.habitat !== 'agua');
+            if (landAnimals.length > 0) {
+                const index = Math.floor(Math.random() * landAnimals.length);
+                const animal = landAnimals[index];
+                animals = animals.filter(a => a !== animal);
+                gameState.food += 25;
+                gameState.materials += 10;
+                showEvent("¡Caza Exitosa!", `Has cazado: ${animal.type.name}.`);
+                updateDisplay();
+            } else {
+                showEvent("No queda Caza", "No hay animales terrestres cerca.");
+            }
+        }
+
+        function cultivate() {
+            if (gameState.materials >= 10) {
+                gameState.materials -= 10;
+                gameState.food += 30;
+                updateDisplay();
+            } else {
+                showEvent("¡Sin Materiales!", "Necesitas 10 materiales para cultivar.");
+            }
+        }
+
+        function build() {
+            if (gameState.materials >= 30) {
+                gameState.materials -= 30;
+                gameState.population += 5;
+                buildings.push(createBuilding());
+                updateDisplay();
+            } else {
+                showEvent("¡Sin Materiales!", "Necesitas 30 materiales para construir.");
+            }
+        }
+        
+        function showEvent(title, description) {
+            const p = document.getElementById('eventPopup');
+            p.style.display = 'flex';
+            p.style.flexDirection = 'column';
+            p.querySelector('#eventTitle').textContent = title;
+            p.querySelector('#eventDescription').textContent = description;
+        }
+
+        function closeEvent() {
+            document.getElementById('eventPopup').style.display = 'none';
+        }
+        
+        function showGameOver(message) {
+            const p = document.getElementById('gameOverScreen');
+            p.style.display = 'flex';
+            p.style.flexDirection = 'column';
+            p.querySelector('#gameOverMessage').textContent = message;
+            clearInterval(gameInterval);
+        }
+        
+        window.addEventListener('load', initGame);
+        window.addEventListener('resize', initGame);
+    </script>
+</body>
+</html>
