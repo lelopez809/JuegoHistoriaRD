@@ -1,18 +1,20 @@
-<!DOCTYPE html>
+ecosistema: {
+                title: "🌿 Equilibrio del Ecosistema",
+                content: "Los taínos entendían la importancia del equilibrio natural. Sabían que cazar en exceso podía agotar los recursos, por lo que desarrollaron prácticas sostenibles que permitían la regeneración de la fauna y flora.",
+                unlockCondition: () => discoveredKnowledge.has('caza') && discoveredKnowledge.has('agricultura')
+            },<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juego del Cacique Taíno</title>
     <style>
-        /* 1. Reset para quitar márgenes */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* 2. Estilos para forzar pantalla completa */
         html, body {
             width: 100%;
             height: 100%;
@@ -21,7 +23,6 @@
             font-family: 'Courier New', monospace;
         }
 
-        /* 3. Contenedor principal del juego */
         #gameContainer {
             display: flex;
             width: 100%;
@@ -38,7 +39,6 @@
             display: block;
         }
 
-        /* 4. Estilos para la barra lateral (UI) */
         #ui {
             width: 320px;
             flex-shrink: 0;
@@ -48,39 +48,114 @@
             overflow-y: auto;
             color: white;
         }
-        .era-title { color: #FFD700; font-size: 1.3em; text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
-        .resource-panel, .info-panel, .controls { background: rgba(139, 69, 19, 0.2); padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 2px solid #8B4513; }
-        .resource-item { display: flex; justify-content: space-between; margin: 10px 0; font-size: 1em; }
-        .info-panel { background: rgba(0, 50, 100, 0.2); border-color: #4682B4; }
-        .controls { background: rgba(50, 50, 50, 0.3); border-color: #666; }
-        .btn { background: #8B4513; color: white; border: none; padding: 10px 15px; margin: 5px 0; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.9em; transition: background 0.3s; width: 100%; border-bottom: 3px solid #654321; }
-        .btn:hover { background: #A0522D; }
-        .btn:active { transform: translateY(2px); border-bottom-width: 1px; }
-        .event-popup, #gameOverScreen { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); border: 3px solid #FFD700; border-radius: 10px; padding: 25px; width: 90%; max-width: 450px; text-align: center; z-index: 1000; display: none; }
-        .event-title { color: #FFD700; font-size: 1.2em; margin-bottom: 15px; }
-        .progress-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin-top: 10px; overflow: hidden; border: 1px solid #555; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.5s ease; }
-        .test-css-class {
-            background-color: #ff00ff; /* Magenta de prueba */
-        }
-    /* Prueba de edición - Jules v3 */
 
-        /* Estilos específicos para el Popup de Notas de Aprendizaje */
+        .era-title { 
+            color: #FFD700; 
+            font-size: 1.3em; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+            border-bottom: 2px solid #FFD700; 
+            padding-bottom: 10px; 
+        }
+
+        .resource-panel, .info-panel, .controls { 
+            background: rgba(139, 69, 19, 0.2); 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 8px; 
+            border: 2px solid #8B4513; 
+        }
+
+        .resource-item { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 10px 0; 
+            font-size: 1em; 
+        }
+
+        .info-panel { 
+            background: rgba(0, 50, 100, 0.2); 
+            border-color: #4682B4; 
+        }
+
+        .controls { 
+            background: rgba(50, 50, 50, 0.3); 
+            border-color: #666; 
+        }
+
+        .btn { 
+            background: #8B4513; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
+            margin: 5px 0; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-family: inherit; 
+            font-size: 0.9em; 
+            transition: background 0.3s; 
+            width: 100%; 
+            border-bottom: 3px solid #654321; 
+        }
+
+        .btn:hover { 
+            background: #A0522D; 
+        }
+
+        .btn:active { 
+            transform: translateY(2px); 
+            border-bottom-width: 1px; 
+        }
+
+        .event-popup, #gameOverScreen { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0, 0, 0, 0.95); 
+            border: 3px solid #FFD700; 
+            border-radius: 10px; 
+            padding: 25px; 
+            width: 90%; 
+            max-width: 450px; 
+            text-align: center; 
+            z-index: 1000; 
+            display: none; 
+            color: white;
+        }
+
+        .event-title { 
+            color: #FFD700; 
+            font-size: 1.2em; 
+            margin-bottom: 15px; 
+        }
+
+        .progress-bar { 
+            width: 100%; 
+            height: 10px; 
+            background: #333; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+            overflow: hidden; 
+            border: 1px solid #555; 
+        }
+
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #4CAF50, #8BC34A); 
+            transition: width 0.5s ease; 
+        }
+
         #learningNoteContent {
-            text-align: left; /* Asegurar alineación a la izquierda para textos largos */
-            line-height: 1.6; /* Mejorar legibilidad para bloques de texto */
-        }
-
-        /* Para asegurar que el botón dentro del nuevo popup también tome el ancho completo si es necesario */
-        /* Aunque la clase .btn ya tiene width: 100%, esto es por si acaso o para futuras modificaciones */
-        #closeLearningNoteBtn {
-            /* Podríamos añadir estilos específicos aquí si fueran necesarios en el futuro */
-            /* Por ahora, hereda de .btn y es suficiente */
+            text-align: left;
+            line-height: 1.6;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div id="gameContainer" data-test-id="jules-test">
+    <div id="gameContainer">
         <div id="canvasContainer">
             <canvas id="gameCanvas"></canvas>
         </div>
@@ -91,6 +166,7 @@
                 <div class="resource-item"><span>👥 Población:</span><span id="population"></span></div>
                 <div class="resource-item"><span>🌽 Comida:</span><span id="food"></span></div>
                 <div class="resource-item"><span>🪨 Materiales:</span><span id="materials"></span></div>
+                <div class="resource-item"><span>🧠 Conocimiento:</span><span id="knowledge"></span></div>
                 <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
             </div>
             <div class="info-panel">
@@ -102,23 +178,111 @@
                 <button class="btn" onclick="cultivate()">🌱 Cultivar</button>
                 <button class="btn" onclick="hunt()">🏹 Cazar</button>
                 <button class="btn" onclick="build()">🏗️ Construir Bohío</button>
+                <button class="btn" onclick="explore()">🔍 Explorar</button>
+                <button class="btn" onclick="showKnowledgePanel()">📚 Conocimientos</button>
+                <button class="btn" id="pauseBtn" onclick="togglePause()">⏸️ Pausar</button>
             </div>
         </div>
     </div>
     
-    <div id="eventPopup" class="event-popup"><div class="event-title" id="eventTitle"></div><div id="eventDescription"></div><button class="btn" onclick="closeEvent()">Continuar</button></div>
-    <div id="gameOverScreen" class="event-popup"><div class="event-title">FIN DEL JUEGO</div><div id="gameOverMessage"></div><button class="btn" onclick="location.reload()">Jugar de Nuevo</button></div>
+    <div id="eventPopup" class="event-popup">
+        <div class="event-title" id="eventTitle"></div>
+        <div id="eventDescription"></div>
+        <button class="btn" onclick="closeEvent()">Continuar</button>
+    </div>
+    
+    <div id="gameOverScreen" class="event-popup">
+        <div class="event-title">FIN DEL JUEGO</div>
+        <div id="gameOverMessage"></div>
+        <button class="btn" onclick="restartGame()">Jugar de Nuevo</button>
+    </div>
+
+    <div id="learningNotePopup" class="event-popup" style="display: none;">
+        <div class="event-title" id="learningNoteTitle"></div>
+        <div id="learningNoteContent" style="margin-bottom: 15px; max-height: 300px; overflow-y: auto;"></div>
+        <button class="btn" id="closeLearningNoteBtn">Entendido</button>
+    </div>
+
+    <div id="knowledgePanel" class="event-popup" style="display: none;">
+        <div class="event-title">📚 Conocimientos Taínos</div>
+        <div id="knowledgeList" style="margin-bottom: 15px; max-height: 400px; overflow-y: auto; text-align: left;">
+            <p style="text-align: center; color: #888;">Explora para descubrir los secretos de la cultura taína...</p>
+        </div>
+        <button class="btn" onclick="closeKnowledgePanel()">Cerrar</button>
+    </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
 
-        let gameState = { population: 25, food: 100, materials: 50, progress: 15 };
+        let gameState = { population: 25, food: 100, materials: 50, progress: 15, knowledge: 0 };
         let villagers = [], buildings = [], trees = [], animals = [], clouds = [];
-        let gameInterval;
+        let gameInterval, animalReproductionInterval;
+        let discoveredKnowledge = new Set();
+        let isPaused = false;
+        let animationId;
         
-        const animalTypes = { JUTIA: { name: 'Jutía' }, IGUANA: { name: 'Iguana' }, COTORRA: { name: 'Cotorra'}, PEZ: { name: 'Pez'} };
+        const animalTypes = { 
+            JUTIA: { name: 'Jutía', maxPopulation: 8, reproductionRate: 0.3 }, 
+            IGUANA: { name: 'Iguana', maxPopulation: 6, reproductionRate: 0.25 }, 
+            COTORRA: { name: 'Cotorra', maxPopulation: 10, reproductionRate: 0.4 }, 
+            PEZ: { name: 'Pez', maxPopulation: 15, reproductionRate: 0.5 } 
+        };
+
+        // Sistema de conocimientos taínos
+        const knowledgeDatabase = {
+            agricultura: {
+                title: "🌱 Agricultura Taína",
+                content: "Los taínos cultivaban principalmente yuca (casabe), maíz, batata, yautía y frijoles. Desarrollaron técnicas avanzadas como el conuco, un sistema de cultivo en montículos que mejoraba el drenaje y la fertilidad del suelo.",
+                unlockCondition: () => gameState.food >= 150
+            },
+            caza: {
+                title: "🏹 Técnicas de Caza",
+                content: "Los taínos cazaban jutías, iguanas y aves usando arcos, flechas y trampas ingeniosas. También pescaban con redes, anzuelos de hueso y técnicas de pesca comunal en los ríos y costas. Practicaban la caza sostenible, permitiendo que los animales se reprodujeran.",
+                unlockCondition: () => animals.filter(a => a.habitat !== 'agua').length < 15
+            },
+            bohios: {
+                title: "🏗️ Arquitectura: Los Bohíos",
+                content: "Los bohíos eran viviendas circulares u ovaladas hechas con estructura de madera, paredes de caña y techo de guano. Eran resistentes a huracanes y perfectamente adaptadas al clima tropical del Caribe.",
+                unlockCondition: () => buildings.length >= 3
+            },
+            cemies: {
+                title: "🗿 Los Cemíes",
+                content: "Los cemíes eran objetos sagrados que representaban a los dioses y espíritus ancestrales. Estaban hechos de piedra, madera, algodón o hueso, y eran fundamentales en las ceremonias religiosas taínas.",
+                unlockCondition: () => gameState.knowledge >= 30
+            },
+            cacique: {
+                title: "👑 El Cacique",
+                content: "El cacique era el líder de la comunidad taína. Heredaba su posición y tenía la responsabilidad de organizar el trabajo, distribuir los recursos y liderar en tiempos de guerra. Vivía en el caney, la casa más grande del pueblo.",
+                unlockCondition: () => gameState.population >= 40
+            },
+            areito: {
+                title: "🎵 El Areíto",
+                content: "El areíto era una ceremonia donde se combinaba canto, danza y narración oral. Era fundamental para transmitir la historia, las tradiciones y las creencias de una generación a otra.",
+                unlockCondition: () => gameState.population >= 30
+            },
+            batey: {
+                title: "⚽ El Batey",
+                content: "El batey era un juego ritual jugado con una pelota de caucho en una cancha rectangular. Tenía significado religioso y social, y era una forma de resolver conflictos entre comunidades.",
+                unlockCondition: () => gameState.materials >= 100
+            },
+            navegacion: {
+                title: "🛶 Navegación Taína",
+                content: "Los taínos eran excelentes navegantes que usaban canoas (kanoa) talladas de troncos de ceiba. Navegaban entre las islas del Caribe para comerciar, explorar y mantener contacto con otras comunidades.",
+                unlockCondition: () => gameState.progress >= 50
+            },
+            casabe: {
+                title: "🫓 El Casabe",
+                content: "El casabe era el pan principal de los taínos, hecho de yuca brava. Desarrollaron un proceso complejo para eliminar el veneno de la yuca y convertirla en una torta nutritiva que podía conservarse por meses.",
+                unlockCondition: () => discoveredKnowledge.has('agricultura')
+            },
+            dujo: {
+                title: "🪑 El Dujó",
+                content: "El dujó era un asiento ceremonial tallado en madera o piedra, usado exclusivamente por caciques y behiques (chamanes). Simbolizaba el poder y la autoridad espiritual en la sociedad taína.",
+                unlockCondition: () => discoveredKnowledge.has('cacique')
+            }
+        };
 
         function resizeCanvas() {
             const container = document.getElementById('canvasContainer');
@@ -128,6 +292,7 @@
 
         function initGame() {
             if (gameInterval) clearInterval(gameInterval);
+            if (animalReproductionInterval) clearInterval(animalReproductionInterval);
             resizeCanvas();
             villagers = [];
             buildings = [];
@@ -135,6 +300,7 @@
             animals = [];
             clouds = [];
             
+            // Crear elementos del mundo
             for (let i = 0; i < 30; i++) {
                 trees.push(createTree());
             }
@@ -157,26 +323,90 @@
                 animals.push(createAnimal(animalTypes.PEZ));
             }
             for (let i = 0; i < 3; i++) {
-                clouds.push({ x: Math.random() * canvas.width, y: Math.random() * 100 + 20, speed: 0.1 + Math.random() * 0.2 });
+                clouds.push({ 
+                    x: Math.random() * canvas.width, 
+                    y: Math.random() * 100 + 20, 
+                    speed: 0.1 + Math.random() * 0.2 
+                });
             }
 
             updateDisplay();
             gameInterval = setInterval(updateGameLogic, 5000);
+            animalReproductionInterval = setInterval(animalReproduction, 8000); // Reproducción cada 8 segundos
             gameLoop();
         }
 
-        function gameLoop() {
-            villagers.forEach(moveObject);
-            animals.forEach(moveObject);
-            clouds.forEach(cloud => {
-                cloud.x += cloud.speed;
-                if (cloud.x > canvas.width + 60) {
-                    cloud.x = -60;
-                }
-            });
+        function drawPauseIndicator() {
+            // Overlay semi-transparente
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Símbolo de pausa
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Barras del símbolo de pausa
+            ctx.fillRect(centerX - 30, centerY - 40, 15, 80);
+            ctx.fillRect(centerX + 15, centerY - 40, 15, 80);
+            
+            // Texto "PAUSADO"
+            ctx.font = 'bold 24px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#FFD700';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.strokeText('PAUSADO', centerX, centerY + 70);
+            ctx.fillText('PAUSADO', centerX, centerY + 70);
+            
+            ctx.font = '16px Courier New';
+            ctx.fillStyle = '#FFF';
+            ctx.fillText('Presiona ▶️ para continuar', centerX, centerY + 100);
+        }
 
+        function togglePause() {
+            isPaused = !isPaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (isPaused) {
+                // Pausar intervalos
+                if (gameInterval) clearInterval(gameInterval);
+                if (animalReproductionInterval) clearInterval(animalReproductionInterval);
+                
+                pauseBtn.innerHTML = '▶️ Reanudar';
+                pauseBtn.style.background = '#228B22';
+            } else {
+                // Reanudar intervalos
+                gameInterval = setInterval(() => {
+                    if (!isPaused) updateGameLogic();
+                }, 5000);
+                animalReproductionInterval = setInterval(() => {
+                    if (!isPaused) animalReproduction();
+                }, 8000);
+                
+                pauseBtn.innerHTML = '⏸️ Pausar';
+                pauseBtn.style.background = '#8B4513';
+            }
+        }
+
+        function gameLoop() {
+            if (!isPaused) {
+                // Mover objetos solo si no está pausado
+                villagers.forEach(moveObject);
+                animals.forEach(moveObject);
+                clouds.forEach(cloud => {
+                    cloud.x += cloud.speed;
+                    if (cloud.x > canvas.width + 60) {
+                        cloud.x = -60;
+                    }
+                });
+            }
+
+            // Siempre dibujar la escena (pausado o no)
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawScenery();
+            
+            // Ordenar objetos por profundidad (Y)
             let allObjects = [...trees, ...buildings, ...villagers, ...animals].sort((a, b) => a.y - b.y);
             allObjects.forEach(obj => {
                 if(obj.isBuilding) {
@@ -189,28 +419,35 @@
                     drawAnimal(obj);
                 }
             });
+            
             clouds.forEach(cloud => {
                 drawCloud(cloud.x, cloud.y);
             });
+
+            // Mostrar indicador de pausa
+            if (isPaused) {
+                drawPauseIndicator();
+            }
             
-            requestAnimationFrame(gameLoop);
+            animationId = requestAnimationFrame(gameLoop);
         }
 
-        // --- FUNCIONES DE CREACIÓN (EXPANDIDAS Y CLARAS) ---
+        // Funciones de creación de objetos
         function createVillager() {
             return {
                 x: Math.random() * (canvas.width - 20),
-                y: Math.random() * (canvas.height - 150) + 50,
+                y: canvas.height * 0.7 + Math.random() * (canvas.height * 0.15), // Solo en tierra
                 vx: (Math.random() - 0.5) * 0.8,
                 vy: (Math.random() - 0.5) * 0.8,
-                isVillager: true
+                isVillager: true,
+                habitat: 'tierra'
             };
         }
         
         function createBuilding() {
             return {
                 x: Math.random() * (canvas.width - 50),
-                y: Math.random() * (canvas.height - 250) + 100,
+                y: canvas.height * 0.7 + Math.random() * (canvas.height * 0.1), // En tierra, no muy abajo
                 isBuilding: true
             };
         }
@@ -218,7 +455,7 @@
         function createTree() {
             return {
                 x: Math.random() * canvas.width,
-                y: Math.random() * (canvas.height - 100),
+                y: canvas.height * 0.65 + Math.random() * (canvas.height * 0.2), // En tierra y vegetación
                 isTree: true
             };
         }
@@ -227,7 +464,7 @@
             let habitat = (type.name === 'Pez') ? 'agua' : (type.name === 'Cotorra' ? 'aire' : 'tierra');
             let animal = {
                 x: Math.random() * canvas.width,
-                y: 0, // Se asigna abajo
+                y: 0,
                 vx: (Math.random() - 0.5) * 1.2,
                 vy: (Math.random() - 0.5) * 1.2,
                 type: type,
@@ -235,77 +472,237 @@
                 habitat: habitat
             };
 
+            // Posicionar según hábitat
             if (habitat === 'agua') {
-                animal.y = canvas.height - 75 + Math.random() * 70;
+                animal.y = canvas.height * 0.92 + Math.random() * (canvas.height * 0.07);
             } else if (habitat === 'aire') {
-                animal.y = Math.random() * 150;
+                animal.y = 15 + Math.random() * (canvas.height * 0.25);
             } else {
-                animal.y = Math.random() * (canvas.height - 150) + 50;
+                animal.y = canvas.height * 0.72 + Math.random() * (canvas.height * 0.12);
             }
             return animal;
         }
 
-        // --- FUNCIÓN DE MOVIMIENTO (EXPANDIDA Y CLARA) ---
         function moveObject(obj) {
             obj.x += obj.vx;
             obj.y += obj.vy;
 
+            // Límites horizontales para todos
             if (obj.x <= 0 || obj.x >= canvas.width - 20) {
                 obj.vx *= -1;
             }
 
+            // Límites verticales según el hábitat
             if (obj.habitat === 'agua') {
-                if (obj.y <= canvas.height - 80 || obj.y >= canvas.height - 10) {
+                // Peces: solo en el mar
+                if (obj.y <= canvas.height * 0.9 || obj.y >= canvas.height - 5) {
                     obj.vy *= -1;
                 }
-            } else {
-                if (obj.y <= 20 || obj.y >= canvas.height - 100) {
+            } else if (obj.habitat === 'aire') {
+                // Aves: solo en el cielo
+                if (obj.y <= 10 || obj.y >= canvas.height * 0.4) {
+                    obj.vy *= -1;
+                }
+            } else if (obj.habitat === 'tierra' || obj.isVillager) {
+                // Animales terrestres y taínos: solo en tierra
+                if (obj.y <= canvas.height * 0.7 || obj.y >= canvas.height * 0.85) {
                     obj.vy *= -1;
                 }
             }
         }
         
-        // --- FUNCIONES DE DIBUJO (EXPANDIDAS Y CLARAS) ---
+        // Funciones de dibujo
         function drawScenery() {
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#87CEEB');
-            gradient.addColorStop(0.7, '#98FB98');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#F4A460';
-            ctx.fillRect(0, canvas.height - 100, canvas.width, 20);
-            ctx.fillStyle = '#4682B4';
-            ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+            // Cielo con gradiente más detallado
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(0.3, '#B0E0E6');
+            skyGradient.addColorStop(0.6, '#98FB98');
+            skyGradient.addColorStop(1, '#90EE90');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.7);
+            
+            // Montañas en el fondo
+            ctx.fillStyle = '#228B22';
+            for (let i = 0; i < 8; i++) {
+                const x = (canvas.width / 8) * i;
+                const height = 40 + Math.sin(i) * 20;
+                ctx.beginPath();
+                ctx.moveTo(x, canvas.height * 0.7);
+                ctx.lineTo(x + canvas.width/16, canvas.height * 0.7 - height);
+                ctx.lineTo(x + canvas.width/8, canvas.height * 0.7);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Vegetación de fondo
+            ctx.fillStyle = '#32CD32';
+            ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.15);
+            
+            // Playa con textura
+            const beachGradient = ctx.createLinearGradient(0, canvas.height * 0.85, 0, canvas.height * 0.9);
+            beachGradient.addColorStop(0, '#F4A460');
+            beachGradient.addColorStop(0.5, '#DEB887');
+            beachGradient.addColorStop(1, '#D2B48C');
+            ctx.fillStyle = beachGradient;
+            ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.05);
+            
+            // Detalles de la playa (rocas y conchas)
+            ctx.fillStyle = '#8B4513';
+            for (let i = 0; i < 15; i++) {
+                const x = Math.random() * canvas.width;
+                const y = canvas.height * 0.85 + Math.random() * (canvas.height * 0.05);
+                ctx.fillRect(x, y, 3, 2);
+            }
+            
+            // Mar con olas animadas
+            const seaGradient = ctx.createLinearGradient(0, canvas.height * 0.9, 0, canvas.height);
+            seaGradient.addColorStop(0, '#4682B4');
+            seaGradient.addColorStop(0.3, '#5F9EA0');
+            seaGradient.addColorStop(0.7, '#4169E1');
+            seaGradient.addColorStop(1, '#191970');
+            ctx.fillStyle = seaGradient;
+            ctx.fillRect(0, canvas.height * 0.9, canvas.width, canvas.height * 0.1);
+            
+            // Olas en la orilla
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            const waveTime = Date.now() * 0.003;
+            for (let x = 0; x < canvas.width; x += 8) {
+                const waveHeight = 2 + Math.sin(x * 0.02 + waveTime) * 1;
+                ctx.fillRect(x, canvas.height * 0.89, 6, waveHeight);
+            }
+            
+            // Olas en el mar
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let x = 0; x < canvas.width; x += 15) {
+                const waveHeight = 1 + Math.sin(x * 0.01 + waveTime * 0.7) * 0.5;
+                ctx.fillRect(x, canvas.height * 0.95, 10, waveHeight);
+            }
+            
+            // Sol
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.85, canvas.height * 0.15, 25, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Rayos del sol
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const startX = canvas.width * 0.85 + Math.cos(angle) * 30;
+                const startY = canvas.height * 0.15 + Math.sin(angle) * 30;
+                const endX = canvas.width * 0.85 + Math.cos(angle) * 40;
+                const endY = canvas.height * 0.15 + Math.sin(angle) * 40;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+            }
         }
 
         function drawCloud(x, y) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fillRect(x, y, 25, 10);
-            ctx.fillRect(x - 10, y + 5, 45, 15);
-            ctx.fillRect(x + 10, y - 5, 25, 10);
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 5;
+            
+            // Nube más detallada con múltiples círculos
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.arc(x + 15, y, 15, 0, Math.PI * 2);
+            ctx.arc(x + 30, y, 12, 0, Math.PI * 2);
+            ctx.arc(x + 10, y - 8, 10, 0, Math.PI * 2);
+            ctx.arc(x + 20, y - 8, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
         }
 
         function drawTaino(x, y) {
-            ctx.fillStyle = '#8B4513';
-            ctx.fillRect(x + 5, y + 12, 6, 3);
+            // Sombra
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(x + 2, y + 19, 12, 2);
+            
+            // Plumas en la cabeza
+            ctx.fillStyle = '#FF4500';
+            ctx.fillRect(x + 6, y - 2, 2, 6);
+            ctx.fillRect(x + 8, y - 3, 2, 7);
+            ctx.fillRect(x + 10, y - 2, 2, 6);
+            
+            // Cabello
             ctx.fillStyle = '#000';
-            ctx.fillRect(x + 3, y + 1, 10, 3);
-            ctx.fillRect(x + 2, y + 2, 2, 2);
-            ctx.fillRect(x + 12, y + 2, 2, 2);
+            ctx.fillRect(x + 3, y + 1, 10, 4);
+            
+            // Cara
             ctx.fillStyle = '#D2691E';
             ctx.fillRect(x + 4, y + 2, 8, 6);
-            ctx.fillRect(x + 5, y + 8, 6, 8);
-            ctx.fillRect(x + 3, y + 9, 2, 4);
-            ctx.fillRect(x + 11, y + 9, 2, 4);
-            ctx.fillRect(x + 5, y + 16, 2, 3);
-            ctx.fillRect(x + 9, y + 16, 2, 3);
+            
+            // Ojos
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 5, y + 3, 1, 1);
+            ctx.fillRect(x + 10, y + 3, 1, 1);
+            
+            // Nariz
+            ctx.fillStyle = '#CD853F';
+            ctx.fillRect(x + 7, y + 4, 2, 1);
+            
+            // Collar
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(x + 5, y + 8, 6, 1);
+            
+            // Cuerpo
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(x + 5, y + 9, 6, 8);
+            
+            // Brazos
+            ctx.fillStyle = '#D2691E';
+            ctx.fillRect(x + 3, y + 10, 2, 5);
+            ctx.fillRect(x + 11, y + 10, 2, 5);
+            
+            // Piernas
+            ctx.fillRect(x + 5, y + 17, 2, 4);
+            ctx.fillRect(x + 9, y + 17, 2, 4);
+            
+            // Pies
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(x + 4, y + 20, 3, 1);
+            ctx.fillRect(x + 9, y + 20, 3, 1);
         }
 
         function drawBohio(x, y) {
+            // Sombra del bohío
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(x + 6, y + 26, 22, 3);
+            
+            // Base de piedra
+            ctx.fillStyle = '#696969';
+            ctx.fillRect(x + 2, y + 23, 28, 2);
+            
+            // Paredes principales
             ctx.fillStyle = '#DEB887';
             ctx.fillRect(x + 4, y + 12, 24, 12);
+            
+            // Detalles de las paredes (bambú)
+            ctx.fillStyle = '#D2B48C';
+            for (let i = 0; i < 6; i++) {
+                ctx.fillRect(x + 6 + i * 4, y + 12, 1, 12);
+            }
+            
+            // Puerta
             ctx.fillStyle = '#654321';
             ctx.fillRect(x + 13, y + 16, 6, 8);
+            
+            // Marco de la puerta
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(x + 12, y + 16, 1, 8);
+            ctx.fillRect(x + 19, y + 16, 1, 8);
+            ctx.fillRect(x + 12, y + 16, 8, 1);
+            
+            // Ventana
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(x + 6, y + 14, 4, 3);
+            
+            // Techo principal
             ctx.fillStyle = '#8B4513';
             ctx.beginPath();
             ctx.moveTo(x, y + 12);
@@ -313,25 +710,60 @@
             ctx.lineTo(x + 32, y + 12);
             ctx.closePath();
             ctx.fill();
+            
+            // Detalles del techo (guano/paja)
+            ctx.fillStyle = '#DAA520';
+            for (let i = 0; i < 8; i++) {
+                ctx.fillRect(x + 2 + i * 4, y + 2 + i, 3, 10 - i);
+            }
         }
 
         function drawPalmTree(x, y) {
+            // Sombra del árbol
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(x + 4, y + 25, 8, 2);
+            
+            // Tronco con textura
             ctx.fillStyle = '#8B4513';
             ctx.fillRect(x + 6, y + 16, 4, 8);
+            
+            // Anillos del tronco
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(x + 6, y + 18, 4, 1);
+            ctx.fillRect(x + 6, y + 21, 4, 1);
+            
+            // Hojas principales (más detalladas)
             ctx.fillStyle = '#228B22';
-            ctx.fillRect(x + 2, y + 8, 12, 8);
-            ctx.fillRect(x, y + 6, 4, 2);
-            ctx.fillRect(x + 12, y + 6, 4, 2);
-            ctx.fillRect(x + 4, y + 4, 2, 4);
-            ctx.fillRect(x + 10, y + 4, 2, 4);
-            ctx.fillRect(x + 6, y + 2, 4, 6);
+            
+            // Hoja superior
+            ctx.fillRect(x + 6, y + 2, 4, 12);
+            
+            // Hojas laterales
+            ctx.fillRect(x, y + 6, 8, 3);
+            ctx.fillRect(x + 8, y + 6, 8, 3);
+            
+            // Hojas diagonales
+            ctx.fillRect(x + 2, y + 4, 6, 2);
+            ctx.fillRect(x + 8, y + 4, 6, 2);
+            ctx.fillRect(x + 2, y + 10, 6, 2);
+            ctx.fillRect(x + 8, y + 10, 6, 2);
+            
+            // Cocos
             ctx.fillStyle = '#654321';
             ctx.fillRect(x + 7, y + 14, 2, 2);
             ctx.fillRect(x + 9, y + 15, 2, 2);
+            ctx.fillRect(x + 5, y + 15, 2, 2);
+            
+            // Detalles de las hojas (nervaduras)
+            ctx.fillStyle = '#32CD32';
+            ctx.fillRect(x + 7, y + 3, 2, 10);
+            ctx.fillRect(x + 2, y + 7, 6, 1);
+            ctx.fillRect(x + 10, y + 7, 6, 1);
         }
 
         function drawAnimal(animal) {
             const { x, y, type } = animal;
+            
             if (type.name === 'Jutía') {
                 ctx.fillStyle = '#8B4513';
                 ctx.fillRect(x, y, 12, 8);
@@ -354,16 +786,28 @@
             }
         }
         
-        // --- FUNCIONES DE LÓGICA Y UI (EXPANDIDAS Y CLARAS) ---
+        // Funciones de lógica del juego
         function updateDisplay() {
             document.getElementById('population').textContent = gameState.population;
             document.getElementById('food').textContent = gameState.food;
             document.getElementById('materials').textContent = gameState.materials;
+            document.getElementById('knowledge').textContent = gameState.knowledge;
             document.getElementById('progressBar').style.width = gameState.progress + '%';
+            
+            // Verificar nuevos conocimientos desbloqueados
+            checkNewKnowledge();
         }
 
         function updateGameLogic() {
+            // Consumo de comida
             gameState.food -= Math.ceil(gameState.population / 5);
+            
+            // Generar conocimiento pasivo
+            if (gameState.population > 0) {
+                gameState.knowledge += Math.floor(gameState.population / 10) + 1;
+                gameState.progress += 0.5;
+            }
+            
             if (gameState.food <= 0) {
                 gameState.food = 0;
                 gameState.population -= 1;
@@ -377,6 +821,34 @@
             updateDisplay();
         }
 
+        // Sistema de reproducción de animales
+        function animalReproduction() {
+            Object.values(animalTypes).forEach(animalType => {
+                const currentCount = animals.filter(animal => animal.type.name === animalType.name).length;
+                
+                // Solo reproducir si está por debajo de la población máxima
+                if (currentCount < animalType.maxPopulation) {
+                    // Probabilidad de reproducción basada en la tasa del animal
+                    if (Math.random() < animalType.reproductionRate) {
+                        // Crear nuevo animal
+                        const newAnimal = createAnimal(animalType);
+                        animals.push(newAnimal);
+                        
+                        // Mostrar evento ocasional (solo 20% de las veces para no spam)
+                        if (Math.random() < 0.2) {
+                            const messages = [
+                                `¡Nueva vida! Han nacido crías de ${animalType.name}.`,
+                                `El ecosistema prospera: nuevos ${animalType.name}s aparecen.`,
+                                `¡Reproducción exitosa! La población de ${animalType.name}s crece.`
+                            ];
+                            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                            showEvent("🌱 Vida Silvestre", randomMessage);
+                        }
+                    }
+                }
+            });
+        }
+
         function hunt() {
             let landAnimals = animals.filter(a => a.habitat !== 'agua');
             if (landAnimals.length > 0) {
@@ -385,7 +857,8 @@
                 animals = animals.filter(a => a !== animal);
                 gameState.food += 25;
                 gameState.materials += 10;
-                showEvent("¡Caza Exitosa!", `Has cazado: ${animal.type.name}.`);
+                gameState.knowledge += 5;
+                showEvent("¡Caza Exitosa!", `Has cazado: ${animal.type.name}. +5 conocimiento sobre técnicas de caza.`);
                 updateDisplay();
             } else {
                 showEvent("No queda Caza", "No hay animales terrestres cerca.");
@@ -396,6 +869,8 @@
             if (gameState.materials >= 10) {
                 gameState.materials -= 10;
                 gameState.food += 30;
+                gameState.knowledge += 3;
+                showEvent("¡Cultivo Exitoso!", "Has cultivado yuca y maíz. +3 conocimiento sobre agricultura.");
                 updateDisplay();
             } else {
                 showEvent("¡Sin Materiales!", "Necesitas 10 materiales para cultivar.");
@@ -406,19 +881,103 @@
             if (gameState.materials >= 30) {
                 gameState.materials -= 30;
                 gameState.population += 5;
+                gameState.knowledge += 8;
                 buildings.push(createBuilding());
+                showEvent("¡Construcción Exitosa!", "Has construido un nuevo bohío. +8 conocimiento sobre arquitectura.");
                 updateDisplay();
             } else {
                 showEvent("¡Sin Materiales!", "Necesitas 30 materiales para construir.");
             }
         }
+
+        function explore() {
+            if (gameState.population >= 5) {
+                const discoveries = [
+                    { type: 'materials', amount: 20, knowledge: 10, message: "Has encontrado piedras y maderas útiles." },
+                    { type: 'food', amount: 15, knowledge: 8, message: "Has descubierto frutas silvestres y plantas comestibles." },
+                    { type: 'knowledge', amount: 25, message: "Has explorado cuevas con petroglifos ancestrales." },
+                    { type: 'animals', knowledge: 12, message: "Has observado la fauna local y aprendido sobre sus comportamientos." }
+                ];
+                
+                const discovery = discoveries[Math.floor(Math.random() * discoveries.length)];
+                
+                if (discovery.type === 'materials') {
+                    gameState.materials += discovery.amount;
+                    gameState.knowledge += discovery.knowledge;
+                } else if (discovery.type === 'food') {
+                    gameState.food += discovery.amount;
+                    gameState.knowledge += discovery.knowledge;
+                } else if (discovery.type === 'knowledge') {
+                    gameState.knowledge += discovery.amount;
+                } else if (discovery.type === 'animals') {
+                    gameState.knowledge += discovery.knowledge;
+                    // Añadir nuevo animal al mapa
+                    const animalTypesArray = Object.values(animalTypes);
+                    const randomType = animalTypesArray[Math.floor(Math.random() * animalTypesArray.length)];
+                    animals.push(createAnimal(randomType));
+                }
+                
+                gameState.population -= 1; // Costo de exploración
+                showEvent("¡Exploración Exitosa!", `${discovery.message} +${discovery.knowledge || 0} conocimiento.`);
+                updateDisplay();
+            } else {
+                showEvent("¡Sin Exploradores!", "Necesitas al menos 5 personas para explorar con seguridad.");
+            }
+        }
+
+        // Sistema de conocimientos
+        function checkNewKnowledge() {
+            Object.keys(knowledgeDatabase).forEach(key => {
+                const knowledge = knowledgeDatabase[key];
+                if (!discoveredKnowledge.has(key) && knowledge.unlockCondition()) {
+                    discoveredKnowledge.add(key);
+                    showLearningNote(knowledge.title, knowledge.content);
+                }
+            });
+        }
+
+        function showLearningNote(title, content) {
+            const popup = document.getElementById('learningNotePopup');
+            popup.style.display = 'flex';
+            popup.style.flexDirection = 'column';
+            document.getElementById('learningNoteTitle').textContent = title;
+            document.getElementById('learningNoteContent').textContent = content;
+        }
+
+        function showKnowledgePanel() {
+            const popup = document.getElementById('knowledgePanel');
+            const knowledgeList = document.getElementById('knowledgeList');
+            
+            if (discoveredKnowledge.size === 0) {
+                knowledgeList.innerHTML = '<p style="text-align: center; color: #888;">Explora para descubrir los secretos de la cultura taína...</p>';
+            } else {
+                let html = '';
+                discoveredKnowledge.forEach(key => {
+                    const knowledge = knowledgeDatabase[key];
+                    html += `
+                        <div style="margin-bottom: 20px; padding: 15px; background: rgba(139, 69, 19, 0.1); border-radius: 8px; border-left: 4px solid #FFD700;">
+                            <h4 style="color: #FFD700; margin-bottom: 8px;">${knowledge.title}</h4>
+                            <p style="line-height: 1.5; color: white;">${knowledge.content}</p>
+                        </div>
+                    `;
+                });
+                knowledgeList.innerHTML = html;
+            }
+            
+            popup.style.display = 'flex';
+            popup.style.flexDirection = 'column';
+        }
+
+        function closeKnowledgePanel() {
+            document.getElementById('knowledgePanel').style.display = 'none';
+        }
         
         function showEvent(title, description) {
-            const p = document.getElementById('eventPopup');
-            p.style.display = 'flex';
-            p.style.flexDirection = 'column';
-            p.querySelector('#eventTitle').textContent = title;
-            p.querySelector('#eventDescription').textContent = description;
+            const popup = document.getElementById('eventPopup');
+            popup.style.display = 'flex';
+            popup.style.flexDirection = 'column';
+            popup.querySelector('#eventTitle').textContent = title;
+            popup.querySelector('#eventDescription').textContent = description;
         }
 
         function closeEvent() {
@@ -426,20 +985,37 @@
         }
         
         function showGameOver(message) {
-            const p = document.getElementById('gameOverScreen');
-            p.style.display = 'flex';
-            p.style.flexDirection = 'column';
-            p.querySelector('#gameOverMessage').textContent = message;
+            const popup = document.getElementById('gameOverScreen');
+            popup.style.display = 'flex';
+            popup.style.flexDirection = 'column';
+            popup.querySelector('#gameOverMessage').textContent = message;
+            
+            // Detener todos los intervalos y animaciones
             clearInterval(gameInterval);
+            if (animalReproductionInterval) clearInterval(animalReproductionInterval);
+            if (animationId) cancelAnimationFrame(animationId);
+            isPaused = true;
         }
         
+        // Cerrar popup de notas de aprendizaje
+        document.getElementById('closeLearningNoteBtn').addEventListener('click', function() {
+            document.getElementById('learningNotePopup').style.display = 'none';
+        });
+
+        // Función para reiniciar el juego
+        function restartGame() {
+            isPaused = false;
+            const pauseBtn = document.getElementById('pauseBtn');
+            pauseBtn.innerHTML = '⏸️ Pausar';
+            pauseBtn.style.background = '#8B4513';
+            discoveredKnowledge.clear();
+            gameState = { population: 25, food: 100, materials: 50, progress: 15, knowledge: 0 };
+            initGame();
+        }
+        
+        // Inicializar juego
         window.addEventListener('load', initGame);
         window.addEventListener('resize', initGame);
     </script>
-    <div id="learningNotePopup" class="event-popup" style="display: none;">
-        <div class="event-title" id="learningNoteTitle"></div>
-        <div id="learningNoteContent" style="margin-bottom: 15px; max-height: 300px; overflow-y: auto;"></div>
-        <button class="btn" id="closeLearningNoteBtn">Entendido</button>
-    </div>
 </body>
 </html>
